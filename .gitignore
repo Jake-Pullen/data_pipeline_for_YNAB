@@ -1,0 +1,5 @@
+*.env
+*.csv
+*.log
+server_knowledge_cache.json
+data/*
