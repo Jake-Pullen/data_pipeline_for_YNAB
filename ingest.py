@@ -33,7 +33,7 @@ class Ingest:
         Save the data for a specific entity to a new cache file.
         """
         current_time = time.strftime('%Y%m%d%H%M%S')
-        directory = f'data/{entity}'
+        directory = f'data/raw/{entity}'
         if not os.path.exists(directory):
             os.makedirs(directory)
         entity_file = f'{directory}/{current_time}.json'

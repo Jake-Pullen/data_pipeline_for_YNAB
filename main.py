@@ -2,6 +2,7 @@ import os
 import dotenv
 import logging
 from ingest import Ingest
+from raw_to_base import RawToBase
 
 dotenv.load_dotenv()
 
@@ -20,3 +21,4 @@ ingest_info['BUDGET_ID'] = BUDGET_ID
 
 
 Ingest(ingest_info)
+RawToBase(entities, 'data/raw', 'data/base')
