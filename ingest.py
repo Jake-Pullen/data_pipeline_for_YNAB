@@ -3,35 +3,47 @@ import time
 import json
 import logging
 import requests
+from typing import Dict, Any
 
-
-class injest:
-    def __init__(self, injest_info):
-        self.API_TOKEN = injest_info['API_TOKEN'],
-        self.BUDGET_ID = injest_info['BUDGET_ID'],
-        self.headers = {'Authorization': f'Bearer {self.API_TOKEN}'},
-        self.entities = ['accounts', 'categories', 'months', 'payees', 'transactions', 'scheduled_transactions'],
-        self.base_url = injest_info['base_url'],
-        self.knowledge_file = injest_info['knowledge_file']
+class Ingest:
+    def __init__(self, ingest_info: Dict[str, Any]):
+        """
+        Initialize the Ingest class with the provided configuration.
+        """
+        self.api_token = ingest_info['API_TOKEN']
+        self.budget_id = ingest_info['BUDGET_ID']
+        self.base_url = ingest_info['base_url']
+        self.knowledge_file = ingest_info['knowledge_file']
+        self.entities = ingest_info['entities']
+        self.headers = {'Authorization': f'Bearer {self.api_token}'}
         self.knowledge_cache = self.load_knowledge_cache()
         self.fetch_and_cache_entity_data()
 
-    def load_knowledge_cache(self):
+    def load_knowledge_cache(self) -> Dict[str, Any]:
+        """
+        Load the knowledge cache from the file if it exists.
+        """
         if os.path.exists(self.knowledge_file):
             with open(self.knowledge_file, 'r') as f:
                 return json.load(f)
         return {}
-    
-    def update_entity_data_cache(self,entity, data):
+
+    def save_entity_data_to_raw(self, entity: str, data: Dict[str, Any]):
+        """
+        Save the data for a specific entity to a new cache file.
+        """
         current_time = time.strftime('%Y%m%d%H%M%S')
-        directory = f'data/{entity}' # Directory name is the entity's name
+        directory = f'data/{entity}'
         if not os.path.exists(directory):
-            os.makedirs(directory)  # Create the directory if it does not exist
-        entity_file = f'{directory}/{current_time}.json'  # Separate file for each entity's data
+            os.makedirs(directory)
+        entity_file = f'{directory}/{current_time}.json'
         with open(entity_file, 'w') as f:
             json.dump(data, f, indent=4)
 
-    def update_server_knowledge_cache(self,entity, server_knowledge):
+    def update_server_knowledge_cache(self, entity: str, server_knowledge: Any):
+        """
+        Update the server knowledge cache for a specific entity.
+        """
         try:
             with open(self.knowledge_file, 'r') as f:
                 knowledge_cache = json.load(f)
@@ -43,21 +55,26 @@ class injest:
         with open(self.knowledge_file, 'w') as f:
             json.dump(knowledge_cache, f, indent=4)
 
-    def check_rate_limit(self,response):
+    def check_rate_limit(self, response: requests.Response):
+        """
+        Check and handle the rate limit based on the response headers.
+        """
         rate_limit_header = response.headers.get('X-Rate-Limit')
         if rate_limit_header:
             requests_made, limit = map(int, rate_limit_header.split('/'))
             remaining_requests = limit - requests_made
             logging.info(f"Rate Limit: {remaining_requests}/{limit} requests remaining.")
-            if remaining_requests < 20:  # Arbitrary low number to start handling the limit
+            if remaining_requests < 20:
                 logging.warning("Approaching rate limit. Consider pausing further requests.")
                 # Implement pause or delay logic here if necessary
         else:
             logging.warning("X-Rate-Limit header is missing.")
 
-    def fetch_and_cache_entity_data(self):        
+    def fetch_and_cache_entity_data(self):
+        """
+        Fetch and cache data for all entities.
+        """
         for entity in self.entities:
-            logging.debug(f'entity type is {type(entity)}')
             last_knowledge = self.knowledge_cache.get(entity, 0)
             logging.debug(f'Last Knowledge of {entity.capitalize()}: {last_knowledge}')
             url = f'{self.base_url}/{self.budget_id}/{entity}'
@@ -66,26 +83,21 @@ class injest:
                 url = url + f'?last_knowledge_of_server={last_knowledge}'
             
             response = requests.get(url, headers=self.headers)
-            self.check_rate_limit(response)  # Check and handle rate limit
+            self.check_rate_limit(response)
             
-            if response.status_code == 429:  # HTTP 429 Too Many Requests
+            if response.status_code == 429:
                 logging.error("Rate limit exceeded. Pausing until the limit is reset.")
                 # Implement pause until the limit reset logic here
                 break
             
             data = response.json()
-            
             server_knowledge = data['data'].get('server_knowledge')
             logging.debug(f'{entity.capitalize()} Server Knowledge: {server_knowledge}')
             
-            # Check if there is new server knowledge
             if server_knowledge is not None and server_knowledge != last_knowledge:
-                # Update server knowledge cache
                 self.update_server_knowledge_cache(entity, server_knowledge)
-                
-                # Update entity data cache without server knowledge
                 entity_data = data['data']
-                entity_data.pop('server_knowledge', None)  # Remove server knowledge if exists
-                self.update_entity_data_cache(entity, entity_data)
+                entity_data.pop('server_knowledge', None)
+                self.save_entity_data_to_raw(entity, entity_data)
             else:
                 logging.info(f"No new data for {entity}. Skipping cache update.")
