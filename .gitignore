@@ -3,3 +3,5 @@
 *.log
 server_knowledge_cache.json
 data/*
+.venv/*
+__pycache__/*
