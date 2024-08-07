@@ -4,7 +4,8 @@ entities = ['accounts', 'categories', 'months', 'payees', 'transactions', 'sched
 
 
 #file_path = 'data/base/categories.parquet'
-file_path = 'data/base/accounts.parquet'
+#file_path = 'data/base/accounts.parquet'
+file_path = 'data/base/transactions.parquet'
 
 # Read the parquet file into a polars DataFrame
 transactions_df = pl.read_parquet(file_path)
