@@ -75,6 +75,11 @@ class Ingest:
         Fetch and cache data for all entities.
         """
         for entity in self.entities:
+            # if we already have files in the raw data folder, we need to skip that entity
+            file_path = f'data/raw/{entity}'
+            if os.path.exists(file_path) and os.listdir(file_path):
+                logging.warning(f"Skipping entity: {entity} as the raw data folder is not empty.")
+                continue
             last_knowledge = self.knowledge_cache.get(entity, 0)
             logging.debug(f'Last Knowledge of {entity.capitalize()}: {last_knowledge}')
             url = f'{self.base_url}/{self.budget_id}/{entity}'

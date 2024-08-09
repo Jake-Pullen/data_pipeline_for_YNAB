@@ -6,19 +6,12 @@ from typing import List, Dict, Any
 import polars as pl
 
 class RawToBase:
-    def __init__(self, entities: List[str]):
-        self.entities = entities
-        self.config = {
-            'accounts': {'unique_id': 'id'},
-            'categories': {'unique_id': 'id'},
-            'months': {'unique_id': 'month'},
-            'payees': {'unique_id': 'id'},
-            'transactions': {'unique_id': 'id'},
-            'scheduled_transactions': {'unique_id': 'id'}
-        }
+    def __init__(self, config: Dict[str, Any]):
+        self.entities = config['entities']
+        self.primary_keys = config['primary_keys']
         self.raw_data_path = 'data/raw'
-        self.base_data_path = 'data/base'
         self.processed_data_path = 'data/processed'
+        self.base_data_path = 'data/base'
         self.data = {}
         self.base_data = {}
         logging.basicConfig(level=logging.DEBUG)
@@ -55,26 +48,34 @@ class RawToBase:
                     with open(file_path, 'r') as f:
                         data = json.load(f)
                         # Check if the data is empty
+                    if entity == "categories":
+                        # Check if any category group has categories
+                        has_categories = any(group.get("categories") for group in data.get("category_groups", []))
+                        if not has_categories:
+                            logging.warning(f"Received empty data for entity: {entity} in file: {file_path}, deleting file.")
+                            os.remove(file_path)
+                            return False
+                    else:
                         if not data.get(entity, []):
                             logging.warning(f"Received empty data for entity: {entity} in file: {file_path}, deleting file.")
                             # delete the file as it is empty
                             os.remove(file_path)
                             return  False
-                        modified_data = []
-                        if entity == 'categories':
-                            for group in data.get('category_groups', []):
-                                for category in group.get('categories', []):
-                                    category['ingestion_date'] = datetime.strptime(file_name.split('.')[0], '%Y%m%d%H%M%S').date()
-                                    modified_data.append(category)
-                        else:
-                            for record in data.get(f'{entity}', []):
-                                if isinstance(record, dict):
-                                    record['ingestion_date'] = datetime.strptime(file_name.split('.')[0], '%Y%m%d%H%M%S').date()
-                                    modified_data.append(record)
-                                else:
-                                    modified_data.append({'record': record, 'ingestion_date': datetime.strptime(file_name.split('.')[0], '%Y%m%d%H%M%S').date()})
-                        self.data[entity].append(modified_data)
-                        logging.debug(f"Successfully loaded data from file: {file_path}")
+                    modified_data = []
+                    if entity == 'categories':
+                        for group in data.get('category_groups', []):
+                            for category in group.get('categories', []):
+                                category['ingestion_date'] = datetime.strptime(file_name.split('.')[0], '%Y%m%d%H%M%S').date()
+                                modified_data.append(category)
+                    else:
+                        for record in data.get(f'{entity}', []):
+                            if isinstance(record, dict):
+                                record['ingestion_date'] = datetime.strptime(file_name.split('.')[0], '%Y%m%d%H%M%S').date()
+                                modified_data.append(record)
+                            else:
+                                modified_data.append({'record': record, 'ingestion_date': datetime.strptime(file_name.split('.')[0], '%Y%m%d%H%M%S').date()})
+                    self.data[entity].append(modified_data)
+                    logging.debug(f"Successfully loaded data from file: {file_path}")
                 except Exception as e:
                     logging.error(f"Failed to load data from file: {file_path}, error: {e}")
                     exit(1)
@@ -105,7 +106,7 @@ class RawToBase:
         #print(new_data_df)
         
         # Ensure the unique id column is preserved
-        unique_id = self.config[entity]['unique_id']
+        unique_id = self.primary_keys[entity]['unique_id']
         if unique_id not in new_data_df.columns:
             logging.error(f"Unique ID column '{unique_id}' not found in the combined data for entity: {entity}")
             exit(1)
@@ -115,7 +116,7 @@ class RawToBase:
 
     def _resolve_duplicates(self, entity):
         logging.debug(f"Resolving duplicates for entity: {entity}")
-        unique_id = self.config[entity]['unique_id']
+        unique_id = self.primary_keys[entity]['unique_id']
         self.base_data[entity] = self.base_data[entity].sort(by='ingestion_date').unique(subset=unique_id, keep='first')
         logging.debug(f"Successfully resolved duplicates for entity: {entity}")
 

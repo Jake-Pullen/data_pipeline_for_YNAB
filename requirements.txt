@@ -1,3 +1,4 @@
 python-dotenv
 polars
 requests
+pyyaml

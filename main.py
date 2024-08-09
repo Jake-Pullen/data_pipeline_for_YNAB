@@ -1,6 +1,8 @@
 import os
 import dotenv
 import logging
+import yaml
+
 from ingest import Ingest
 from raw_to_base import RawToBase
 
@@ -10,15 +12,11 @@ API_TOKEN = os.getenv('API_TOKEN')
 BUDGET_ID = os.getenv('BUDGET_ID')
 logging.basicConfig(level=logging.DEBUG)
 
-entities = ['accounts', 'categories', 'months', 'payees', 'transactions', 'scheduled_transactions']
-ingest_info = {}
+with open('config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
 
-ingest_info['entities'] = entities
-ingest_info['base_url'] = 'https://api.ynab.com/v1/budgets'
-ingest_info['knowledge_file'] = 'server_knowledge_cache.json'
-ingest_info['API_TOKEN'] = API_TOKEN
-ingest_info['BUDGET_ID'] = BUDGET_ID
+config['API_TOKEN'] = API_TOKEN
+config['BUDGET_ID'] = BUDGET_ID
 
-
-Ingest(ingest_info)
-RawToBase(entities)
+Ingest(config)
+RawToBase(config)

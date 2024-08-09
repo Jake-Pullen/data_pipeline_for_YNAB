@@ -1,0 +1,22 @@
+entities:
+  - accounts
+  - categories
+  - months
+  - payees
+  - transactions
+  - scheduled_transactions
+base_url: https://api.ynab.com/v1/budgets
+knowledge_file: server_knowledge_cache.json
+primary_keys:
+  accounts:
+    unique_id: id
+  categories:
+    unique_id: id
+  months:
+    unique_id: month
+  payees:
+    unique_id: id
+  transactions:
+    unique_id: id
+  scheduled_transactions:
+    unique_id: id
