@@ -20,3 +20,7 @@ primary_keys:
     unique_id: id
   scheduled_transactions:
     unique_id: id
+raw_data_path: data/raw
+processed_data_path: data/processed
+base_data_path: data/base
+warehouse_data_path: data/warehouse

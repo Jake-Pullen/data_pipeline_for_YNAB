@@ -15,6 +15,7 @@ class Ingest:
         self.base_url = config['base_url']
         self.knowledge_file = config['knowledge_file']
         self.entities = config['entities']
+        self.raw_data_path = config['raw_data_path']
         self.headers = {'Authorization': f'Bearer {self.api_token}'}
         self.knowledge_cache = self.load_knowledge_cache()
         self.fetch_and_cache_entity_data()
@@ -33,7 +34,7 @@ class Ingest:
         Save the data for a specific entity to a new cache file.
         """
         current_time = time.strftime('%Y%m%d%H%M%S')
-        directory = f'data/raw/{entity}'
+        directory = os.path.join(self.raw_data_path, entity)
         if not os.path.exists(directory):
             os.makedirs(directory)
         entity_file = f'{directory}/{current_time}.json'

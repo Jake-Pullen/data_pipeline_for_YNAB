@@ -5,6 +5,7 @@ import yaml
 
 from pipeline.ingest import Ingest
 from pipeline.raw_to_base import RawToBase
+from pipeline.dimAccounts import DimAccounts
 
 dotenv.load_dotenv()
 
@@ -20,3 +21,4 @@ config['BUDGET_ID'] = BUDGET_ID
 
 Ingest(config)
 RawToBase(config)
+DimAccounts(config)

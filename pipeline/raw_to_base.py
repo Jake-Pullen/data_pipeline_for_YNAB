@@ -9,9 +9,9 @@ class RawToBase:
     def __init__(self, config: Dict[str, Any]):
         self.entities = config['entities']
         self.primary_keys = config['primary_keys']
-        self.raw_data_path = 'data/raw'
-        self.processed_data_path = 'data/processed'
-        self.base_data_path = 'data/base'
+        self.raw_data_path = config['raw_data_path']
+        self.processed_data_path = config['processed_data_path']
+        self.base_data_path = config['base_data_path']
         self.data = {}
         self.base_data = {}
         logging.basicConfig(level=logging.DEBUG)
