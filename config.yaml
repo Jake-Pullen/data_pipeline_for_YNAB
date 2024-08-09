@@ -6,7 +6,7 @@ entities:
   - transactions
   - scheduled_transactions
 base_url: https://api.ynab.com/v1/budgets
-knowledge_file: server_knowledge_cache.json
+knowledge_file: data\server_knowledge_cache.json
 primary_keys:
   accounts:
     unique_id: id

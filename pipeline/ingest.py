@@ -48,6 +48,9 @@ class Ingest:
             with open(self.knowledge_file, 'r') as f:
                 knowledge_cache = json.load(f)
         except FileNotFoundError:
+            # If the file does not exist, create an empty cache
+            # also create the file so we can save to it later
+            os.makedirs(os.path.dirname(self.knowledge_file), exist_ok=True)
             knowledge_cache = {}
         
         knowledge_cache[entity] = server_knowledge

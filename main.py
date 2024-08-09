@@ -3,8 +3,8 @@ import dotenv
 import logging
 import yaml
 
-from ingest import Ingest
-from raw_to_base import RawToBase
+from pipeline.ingest import Ingest
+from pipeline.raw_to_base import RawToBase
 
 dotenv.load_dotenv()
 
