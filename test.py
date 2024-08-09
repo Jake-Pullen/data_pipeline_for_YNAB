@@ -1,14 +1,15 @@
 import polars as pl
+
 entities = ['accounts', 'categories', 'months', 'payees', 'transactions', 'scheduled_transactions']
-# Define the path to the transactions parquet file
 
-
-#file_path = 'data/base/categories.parquet'
-#file_path = 'data/base/accounts.parquet'
-file_path = 'data/base/transactions.parquet'
-
-# Read the parquet file into a polars DataFrame
-transactions_df = pl.read_parquet(file_path)
-
-# Display the DataFrame
-print(transactions_df)
+for entity in entities:
+    print(f"Processing entity: {entity}")
+    file_path = f'data/base/{entity}.parquet'
+    # Read the parquet file into a polars DataFrame
+    entity_df = pl.read_parquet(file_path)
+    # Print the schema of the DataFrame
+    print(f"Schema of {entity} DataFrame:")
+    print(entity_df.schema)
+    # Display the first few rows of the DataFrame
+    print(f"First few rows of {entity} DataFrame:")
+    print(entity_df.head())

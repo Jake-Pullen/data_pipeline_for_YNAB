@@ -6,15 +6,15 @@ import requests
 from typing import Dict, Any
 
 class Ingest:
-    def __init__(self, ingest_info: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any]):
         """
         Initialize the Ingest class with the provided configuration.
         """
-        self.api_token = ingest_info['API_TOKEN']
-        self.budget_id = ingest_info['BUDGET_ID']
-        self.base_url = ingest_info['base_url']
-        self.knowledge_file = ingest_info['knowledge_file']
-        self.entities = ingest_info['entities']
+        self.api_token = config['API_TOKEN']
+        self.budget_id = config['BUDGET_ID']
+        self.base_url = config['base_url']
+        self.knowledge_file = config['knowledge_file']
+        self.entities = config['entities']
         self.headers = {'Authorization': f'Bearer {self.api_token}'}
         self.knowledge_cache = self.load_knowledge_cache()
         self.fetch_and_cache_entity_data()
@@ -88,6 +88,10 @@ class Ingest:
                 url = url + f'?last_knowledge_of_server={last_knowledge}'
             
             response = requests.get(url, headers=self.headers)
+            if response.status_code == 401:
+                logging.error("Unauthorized. Please check your API token.")
+                break
+            
             self.check_rate_limit(response)
             
             if response.status_code == 429:
