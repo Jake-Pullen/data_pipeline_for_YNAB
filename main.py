@@ -5,7 +5,7 @@ import yaml
 
 from pipeline.ingest import Ingest
 from pipeline.raw_to_base import RawToBase
-from pipeline.dimAccounts import DimAccounts
+from pipeline.dimensions import DimAccounts, DimCategories, DimPayees, DimDate
 
 dotenv.load_dotenv()
 
@@ -19,6 +19,13 @@ with open('config.yaml', 'r') as file:
 config['API_TOKEN'] = API_TOKEN
 config['BUDGET_ID'] = BUDGET_ID
 
-Ingest(config)
-RawToBase(config)
-DimAccounts(config)
+if __name__ == '__main__':
+    #Ingest(config)
+    #RawToBase(config)
+    #DimAccounts(config)
+    #DimCategories(config)
+    #DimPayees(config)
+    DimDate(config)
+
+
+# dates_df = pl.DataFrame(pl.date_range('2020-01-01', '2030-12-31',"1d", eager=True)).alias('date')

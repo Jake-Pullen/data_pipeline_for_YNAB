@@ -1,6 +1,8 @@
 import polars as pl
 
-entities = ['accounts']#, 'categories', 'months', 'payees', 'transactions', 'scheduled_transactions']
+#entities = ['accounts', 'categories', 'months', 'payees', 'transactions', 'scheduled_transactions']
+entities = ['payees']
+
 
 for entity in entities:
    # print(f"Processing entity: {entity}")
@@ -14,15 +16,14 @@ for entity in entities:
    print(f"First few rows of {entity} DataFrame:")
    print(entity_df.head())
 
-for entity in entities: 
-      # print(f"Processing entity: {entity}")
-   file_path = f'data/warehouse/{entity}.parquet'
-   # Read the parquet file into a polars DataFrame
-   entity_df = pl.read_parquet(file_path)
-   # Print the schema of the DataFrame
-   print(f"Schema of {entity} DataFrame:")
-   print(entity_df.schema)
-   # Display the first few rows of the DataFrame
-   print(f"First few rows of {entity} DataFrame:")
-   with pl.
-      print(entity_df)
+# for entity in entities: 
+#       # print(f"Processing entity: {entity}")
+#    file_path = f'data/warehouse/{entity}.parquet'
+#    # Read the parquet file into a polars DataFrame
+#    entity_df = pl.read_parquet(file_path)
+#    # Print the schema of the DataFrame
+#    print(f"Schema of {entity} DataFrame:")
+#    print(entity_df.schema)
+#    # Display the first few rows of the DataFrame
+#    print(f"First few rows of {entity} DataFrame:")
+#    print(entity_df)
