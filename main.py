@@ -6,6 +6,7 @@ import yaml
 from pipeline.ingest import Ingest
 from pipeline.raw_to_base import RawToBase
 from pipeline.dimensions import DimAccounts, DimCategories, DimPayees, DimDate
+from pipeline.facts import FactTransactions, FactScheduledTransactions
 
 dotenv.load_dotenv()
 
@@ -26,3 +27,5 @@ if __name__ == '__main__':
     DimCategories(config)
     DimPayees(config)
     DimDate(config)
+    FactTransactions(config)
+    FactScheduledTransactions(config)
