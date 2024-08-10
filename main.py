@@ -13,6 +13,9 @@ dotenv.load_dotenv()
 API_TOKEN = os.getenv('API_TOKEN')
 BUDGET_ID = os.getenv('BUDGET_ID')
 logging.basicConfig(level=logging.DEBUG)
+if not API_TOKEN or not BUDGET_ID:
+    logging.error('API_TOKEN or BUDGET_ID is not set in .env file')
+    exit(1)
 
 with open('config.yaml', 'r') as file:
     config = yaml.safe_load(file)
