@@ -1,4 +1,4 @@
-# ERD for the Finance DataWarehouse
+# ERD for the dimensional model
 
 ```mermaid
 erDiagram

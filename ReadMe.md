@@ -1,6 +1,6 @@
-# Budget Management System
+# Data Pipeline for YNAB
 
-This project is a Budget Management System that fetches and caches budget-related data from an API. It organizes the data into a dimensional model and handles rate limits to ensure smooth operation.
+This project is a Data Pipeline for YNAB that fetches and caches budget-related data from an API. It organizes the data into a dimensional model ready to be reported on.
 
 ## [Get Started Guide](docs/Get_Started.md)
 
