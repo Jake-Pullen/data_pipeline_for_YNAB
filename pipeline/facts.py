@@ -77,7 +77,9 @@ class FactScheduledTransactions(Facts):
             scheduled_transactions_df
             .with_columns([
                 pl.col("id").alias("scheduled_transaction_id"),
-                pl.col("date").alias("scheduled_transaction_date"),
+                pl.col("date_first").alias("scheduled_transaction_first_date"),
+                pl.col("date_next").alias("scheduled_transaction_next_date"),
+                pl.col("frequency").alias("scheduled_transaction_frequency"),
                 pl.col("amount").alias("scheduled_transaction_amount"),
                 pl.col("memo").alias("scheduled_transaction_memo"),
                 pl.col("flag_color").alias("scheduled_transaction_flag_color"),
@@ -91,13 +93,10 @@ class FactScheduledTransactions(Facts):
                 (pl.col("amount") / 100).alias("scheduled_transaction_amount"),
             ])
             .drop([
-                "transfer_transaction_id", "matched_transaction_id", "import_id",
                 "subtransactions", "deleted","flag_name","account_name",
-                "payee_name","category_name","import_payee_name","import_payee_name_original",
-                "debt_transaction_type","ingestion_date"
+                "payee_name","category_name","ingestion_date"
             ])
         )
-
         # Write the DataFrame to a new parquet file
         logging.info("Writing the transformed scheduled transactions DataFrame to parquet file")
         scheduled_transactions_df.write_parquet(self.config['warehouse_data_path'] + '/scheduled_transactions.parquet')

@@ -1,7 +1,7 @@
 import polars as pl
 
 #entities = ['accounts', 'categories', 'months', 'payees', 'transactions', 'scheduled_transactions']
-entities = ['transactions']
+entities = ['scheduled_transactions']
 
 
 for entity in entities:
