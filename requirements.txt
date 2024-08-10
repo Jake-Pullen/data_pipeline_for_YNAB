@@ -2,3 +2,4 @@ python-dotenv
 polars
 requests
 pyyaml
+dash
