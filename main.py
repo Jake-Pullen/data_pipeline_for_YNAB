@@ -55,6 +55,8 @@ def main():
     config['API_TOKEN'] = API_TOKEN
     config['BUDGET_ID'] = BUDGET_ID
 
+    logging.info('Starting data pipeline')
+
     Ingest(config)
     RawToBase(config)
     DimAccounts(config)
@@ -63,6 +65,9 @@ def main():
     DimDate(config)
     FactTransactions(config)
     FactScheduledTransactions(config)
+
+    logging.info('Data pipeline completed successfully')
+    sys.exit(ec.SUCCESS)
 
 if __name__ == '__main__':
     try:
