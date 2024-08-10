@@ -2,6 +2,7 @@ import polars as pl
 import logging
 import os
 from datetime import date
+
 class Dimensions:
     def __init__(self, config):
         self.config = config

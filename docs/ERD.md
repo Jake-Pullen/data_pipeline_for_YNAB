@@ -15,11 +15,6 @@ erDiagram
         boolean deleted
     }
     
-    ACCOUNT_TYPES {
-        int account_type_id
-        string account_type_name
-    }
-    
     CATEGORIES {
         int category_id
         string category_name
@@ -69,7 +64,6 @@ erDiagram
         boolean deleted
     }
     
-    ACCOUNTS ||--o{ ACCOUNT_TYPES : "has type"
     TRANSACTIONS ||--o{ ACCOUNTS : "belongs to"
     TRANSACTIONS ||--o{ CATEGORIES : "belongs to"
     TRANSACTIONS ||--o{ PAYEES : "belongs to"
@@ -78,3 +72,5 @@ erDiagram
     SCHEDULED_TRANSACTIONS ||--o{ CATEGORIES : "belongs to"
     SCHEDULED_TRANSACTIONS ||--o{ PAYEES : "belongs to"
     SCHEDULED_TRANSACTIONS ||--o{ DATES : "scheduled on"
+```
+
