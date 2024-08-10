@@ -24,3 +24,5 @@ raw_data_path: data/raw
 processed_data_path: data/processed
 base_data_path: data/base
 warehouse_data_path: data/warehouse
+REQUESTS_MAX_RETRIES: 3
+REQUESTS_RETRY_DELAY: 5
