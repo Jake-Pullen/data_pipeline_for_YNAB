@@ -23,17 +23,9 @@ class Ingest:
         self.raw_data_path = config['raw_data_path']
         self.headers = {'Authorization': f'Bearer {self.api_token}'}
         self.knowledge_cache = self.load_knowledge_cache()
-        self.load_additional_config()
-        self.fetch_and_cache_entity_data()
-
-    def load_additional_config(self):
-        """
-        Load additional configuration values from the config file.
-        """
-        with open('config/config.yaml', 'r') as f:
-            config = yaml.safe_load(f)
         self.MAX_RETRIES = config['REQUESTS_MAX_RETRIES']
         self.RETRY_DELAY = config['REQUESTS_RETRY_DELAY']
+        self.fetch_and_cache_entity_data()
 
     def load_knowledge_cache(self) -> Dict[str, Any]:
         """
