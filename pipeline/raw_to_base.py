@@ -35,7 +35,7 @@ class RawToBase:
                 logging.error(f"entity: {entity} failed duplicate resolution.")
                 sys.exit(ec.DUPLICATE_RESOLUTION_ERROR)
             if not self._save_base_data(entity):
-                logging.warning(f"Skipping processing for entity: {entity} due to failed saving base data.")
+                logging.error(f"Skipping processing for entity: {entity} due to failed saving base data.")
                 continue
             if not self._move_raw_to_processed(entity):
                 logging.error(f"entity: {entity} has been processed, but we could not move the file out of the raw folder, please clear the raw folder for {entity}.")
@@ -165,9 +165,9 @@ Then move the files back in one at a time oldest to newest and run again for eac
         except Exception as e:
             logging.error(f"Failed to save base data for entity: {entity}, error: {e}")
             return False
-            
         logging.debug(f"Saved base data for entity: {entity} to path: {file_path}")
-
+        return True
+    
     def _move_raw_to_processed(self, entity):
         raw_entity_path = os.path.join(self.raw_data_path, entity)
         processed_path = os.path.join(self.processed_data_path, entity)

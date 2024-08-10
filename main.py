@@ -74,5 +74,8 @@ if __name__ == '__main__':
         main()
     except SystemExit as e:
         exit_code = e.code
-        logging.error(f'Program exited with code {exit_code}')
+        if exit_code == ec.SUCCESS:
+            logging.info('Program exited successfully')
+        else:
+            logging.error(f'Program exited with code {exit_code}')
         raise
