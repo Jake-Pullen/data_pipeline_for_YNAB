@@ -14,12 +14,14 @@ from pipeline.dimensions import DimAccounts, DimCategories, DimPayees, DimDate
 from pipeline.facts import FactTransactions, FactScheduledTransactions
 
 def set_up_logging():
-    with open('config/logging_config.yaml', 'r') as f:
-        try:
+    try:
+        with open('config/logging_config.yaml', 'r') as f:
             log_config = yaml.safe_load(f)
-        except yaml.YAMLError as e:
-            print(e)
-    logging.config.dictConfig(log_config)
+        logging.config.dictConfig(log_config)
+    except yaml.YAMLError as e:
+        print(f"Error parsing logging configuration file: {e}")
+        log_config = {}  # Initialize log_config to an empty dictionary
+        logging.basicConfig(level=logging.INFO)  # Fallback to a basic configuration
     queue_handler = logging.getHandlerByName('queue_handler')
     if queue_handler is not None:
         queue_handler.listener.start()
@@ -28,6 +30,7 @@ def set_up_logging():
 logger = logging.getLogger("data_pipeline_for_ynab")
 os.makedirs('logs', exist_ok=True)
 set_up_logging()
+
 # Load environment variables
 dotenv.load_dotenv()
 
@@ -39,8 +42,15 @@ def main():
         logging.error('API_TOKEN or BUDGET_ID is not set in .env file')
         sys.exit(ec.MISSING_ENV_VARS)
 
-    with open('config/config.yaml', 'r') as file:
-        config = yaml.safe_load(file)
+    try:
+        with open('config/config.yaml', 'r') as file:
+            config = yaml.safe_load(file)
+    except FileNotFoundError:
+        logging.error('config.yaml file not found')
+        sys.exit(ec.MISSING_CONFIG_FILE)
+    except yaml.YAMLError as e:
+        logging.error(f'Error loading config.yaml: {e}')
+        sys.exit(ec.CORRUPTED_CONFIG_FILE)
 
     config['API_TOKEN'] = API_TOKEN
     config['BUDGET_ID'] = BUDGET_ID

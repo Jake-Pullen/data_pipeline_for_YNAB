@@ -3,7 +3,9 @@ import time
 import json
 import logging
 import requests
+import sys
 from typing import Dict, Any
+import config.exit_codes as ec
 
 class Ingest:
     def __init__(self, config: Dict[str, Any]):
@@ -71,6 +73,10 @@ class Ingest:
             if remaining_requests < 20:
                 logging.warning("Approaching rate limit. Consider pausing further requests.")
                 # Implement pause or delay logic here if necessary
+            if remaining_requests == 1:
+                logging.error("Rate limit exceeded. ending requests here and moving on with what we have.")
+                return True #returning True here to break out of any more ingestions
+                
         else:
             logging.warning("X-Rate-Limit header is missing.")
 
@@ -94,13 +100,9 @@ class Ingest:
             response = requests.get(url, headers=self.headers)
             if response.status_code == 401:
                 logging.error("Unauthorized. Please check your API token.")
-                break
+                sys.exit(ec.UNAUTHORIZED_API_TOKEN)
             
-            self.check_rate_limit(response)
-            
-            if response.status_code == 429:
-                logging.error("Rate limit exceeded. Pausing until the limit is reset.")
-                # Implement pause until the limit reset logic here
+            if self.check_rate_limit(response):
                 break
             
             data = response.json()
