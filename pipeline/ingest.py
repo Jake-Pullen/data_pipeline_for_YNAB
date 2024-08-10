@@ -30,7 +30,7 @@ class Ingest:
         """
         Load additional configuration values from the config file.
         """
-        with open('config.config.yaml', 'r') as f:
+        with open('config/config.yaml', 'r') as f:
             config = yaml.safe_load(f)
         self.MAX_RETRIES = config['REQUESTS_MAX_RETRIES']
         self.RETRY_DELAY = config['REQUESTS_RETRY_DELAY']
