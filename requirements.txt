@@ -2,4 +2,8 @@ python-dotenv
 polars
 requests
 pyyaml
+#visualisation requirements below
 dash
+pandas
+pyarrow 
+dash-bootstrap-components
