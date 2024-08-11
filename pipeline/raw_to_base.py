@@ -20,6 +20,7 @@ class RawToBase:
 
     def process_entities(self):
         for entity in self.entities:
+            logging.info(f"Processing entity: {entity}")
             # check the file is in the raw data path, if not skip the entity
             folder_path = os.path.join(self.raw_data_path, entity)
             folder_contents = os.listdir(folder_path)
@@ -40,6 +41,7 @@ class RawToBase:
             if not self._move_raw_to_processed(entity):
                 logging.error(f"entity: {entity} has been processed, but we could not move the file out of the raw folder, please clear the raw folder for {entity}.")
                 sys.exit(ec.MOVE_FILE_ERROR)
+            logging.info(f"Successfully processed entity: {entity}")
     
     def _load_raw_data(self, entity):
         entity_path = os.path.join(self.raw_data_path, entity)
