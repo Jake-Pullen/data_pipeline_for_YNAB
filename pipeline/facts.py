@@ -28,11 +28,22 @@ class FactTransactions(Facts):
         # Transform the DataFrame
         logging.info("Transforming the transactions DataFrame")
         try:
+            # Ensure the date column is in datetime format
+            transactions_df = transactions_df.with_columns([
+                pl.col("date").str.strptime(pl.Date, format="%Y-%m-%d").alias("date")
+            ])
+        except Exception as e:
+            logging.error(f"Failed to covert the date to date format: {e}")
+            return
+        
+        try:
             transactions_df = (
                 transactions_df
                 .with_columns([
                     pl.col("id").alias("transaction_id"),
-                    pl.col("date").alias("transaction_date"),
+                    (pl.col("date").dt.year().cast(pl.Utf8) +
+                        pl.col("date").dt.month().cast(pl.Utf8).str.zfill(2) +
+                        pl.col("date").dt.day().cast(pl.Utf8).str.zfill(2)).alias("transaction_date"),
                     pl.col("amount").alias("transaction_amount"),
                     pl.col("memo").alias("transaction_memo"),
                     pl.col("cleared").alias("transaction_cleared"),
@@ -45,7 +56,7 @@ class FactTransactions(Facts):
                 ])
                 .with_columns([
                     pl.col("memo").fill_null("unknown"),
-                    (pl.col("amount") / 100).alias("transaction_amount"),
+                    (pl.col("amount") / 1000).alias("transaction_amount"),
                 ])
                 .drop([
                     "transfer_transaction_id", "matched_transaction_id", "import_id",
@@ -98,7 +109,7 @@ class FactScheduledTransactions(Facts):
                 ])
                 .with_columns([
                     pl.col("memo").fill_null("unknown"),
-                    (pl.col("amount") / 100).alias("scheduled_transaction_amount"),
+                    (pl.col("amount") / 1000).alias("scheduled_transaction_amount"),
                 ])
                 .drop([
                     "subtransactions", "deleted","flag_name","account_name",

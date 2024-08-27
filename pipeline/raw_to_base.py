@@ -130,7 +130,7 @@ Then move the files back in one at a time oldest to newest and run again for eac
                 df = df.with_columns(
                     pl.when(pl.col(col).is_null())
                     .then(pl.lit("null"))
-                    .otherwise(pl.col(col).map_elements(lambda x: str(x) if x is not None else "null"))
+                    .otherwise(pl.col(col).map_elements(lambda x: str(x) if x is not None else "null", return_dtype=pl.Utf8))
                     .alias(col)
                 )
         return df

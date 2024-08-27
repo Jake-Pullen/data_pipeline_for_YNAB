@@ -191,6 +191,18 @@ class DimDate(Dimensions):
         except Exception as e:
             logging.error(f"Failed to create a new column to indicate if the date is a weekday or weekend: {e}")
             return
+        
+        # Create a primary key by concatenating year, month, and day with no separators
+        try:
+            dates_df = dates_df.with_columns([
+                (pl.col('year').cast(pl.Utf8) + 
+                 pl.col('month').cast(pl.Utf8).str.zfill(2) +
+                 pl.col('day').cast(pl.Utf8).str.zfill(2)
+                ).alias('date_id')
+            ])
+        except Exception as e:
+            logging.error(f"Failed to create the primary key column: {e}")
+            return
         # Write the DataFrame to a new parquet file
         logging.info("Writing the transformed dates DataFrame to parquet file")
         try:
