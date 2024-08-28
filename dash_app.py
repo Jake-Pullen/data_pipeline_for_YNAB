@@ -6,7 +6,6 @@ from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
 import pandas as pd
 
-# Load data
 accounts = pl.read_parquet('data/warehouse/accounts.parquet')
 categories = pl.read_parquet('data/warehouse/categories.parquet')
 dates = pl.read_parquet('data/warehouse/dates.parquet')
@@ -149,7 +148,3 @@ app.layout = dbc.Container(
     ],
     fluid=True
 )
-
-# Run the app
-if __name__ == '__main__':
-    app.run(debug=True)
