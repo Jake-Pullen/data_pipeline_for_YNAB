@@ -28,3 +28,7 @@ The Data Warehouse is the data after it has been aggregated and transformed. It 
 ## Processed Archive
 
 The Processed Archive is the data after it has been processed and stored in the base tables. It is the raw json files in the `data/processed/` directory with a folder for each entity and file for each load that has been processed.
+
+## Visualisation datasets
+
+When preparing the data for visualisation, we create dataframes in memory that are used to create the visualisations. These are not stored on disk.

@@ -8,7 +8,7 @@ import logging.config
 import logging.handlers
 
 import config.exit_codes as ec
-from dash_app import app
+#from dash_app import app
 from pipeline.pipeline_main import pipeline_main
 
 def set_up_logging():
@@ -58,7 +58,7 @@ config['BUDGET_ID'] = BUDGET_ID
 if __name__ == '__main__':
     try:
         pipeline_main(config)
-        app.run() #debug=True)
+      #  app.run() #debug=True)
     except SystemExit as e:
         exit_code = e.code
         if exit_code == ec.SUCCESS:
