@@ -8,7 +8,6 @@ import logging.config
 import logging.handlers
 
 import config.exit_codes as ec
-#from dash_app import app
 from pipeline.pipeline_main import pipeline_main
 
 def set_up_logging():
@@ -58,7 +57,15 @@ config['BUDGET_ID'] = BUDGET_ID
 if __name__ == '__main__':
     try:
         pipeline_main(config)
-      #  app.run() #debug=True)
+        
+        # Check if the data was successfully created
+        data_exists = os.path.exists('data/processed') and os.listdir('data/processed')
+        if data_exists:
+            from dash_app import app
+            app.run() # debug=True
+        else:
+            logging.error('Data pipeline did not produce any data. Dash app will not run.')
+            sys.exit(ec.NO_DATA_PRODUCED)
     except SystemExit as e:
         exit_code = e.code
         if exit_code == ec.SUCCESS:

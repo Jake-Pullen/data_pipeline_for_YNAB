@@ -14,9 +14,9 @@ scheduled_transactions = pl.read_parquet('data/warehouse/scheduled_transactions.
 transactions = pl.read_parquet('data/warehouse/transactions.parquet')
 
 # Join transactions with accounts, categories, and payees to create a master DataFrame
-master_df = transactions.join(categories, left_on='category_id', right_on='id', suffix='_category')\
-                    .join(accounts, left_on='account_id', right_on='id', suffix='_account')\
-                    .join(payees, left_on='payee_id', right_on='id', suffix='_payee')\
+master_df = transactions.join(categories, left_on='category_id', right_on='category_id', suffix='_category')\
+                    .join(accounts, left_on='account_id', right_on='account_id', suffix='_account')\
+                    .join(payees, left_on='payee_id', right_on='payee_id', suffix='_payee')\
                     .join(dates, left_on='transaction_date', right_on='date_id', suffix='_date')\
 
 # Create aggregations

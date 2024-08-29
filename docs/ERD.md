@@ -34,23 +34,29 @@ erDiagram
     }
     
     DATES {
-        int date_id
-        string date
+        string date_id
+        date date
         int year
         int month
         int day
+        boolean is_weekday
+        int weekday
     }
     
     TRANSACTIONS {
-        int transaction_id
+        str transaction_id
         int account_id
         int category_id
         int payee_id
-        int date_id
+        int transaction_date
         decimal amount
         boolean cleared
         boolean approved
         boolean deleted
+        string memo
+        string flag_color
+        str transfer_account_id
+
     }
     
     SCHEDULED_TRANSACTIONS {
@@ -58,10 +64,14 @@ erDiagram
         int account_id
         int category_id
         int payee_id
-        int date_id
+        str date_first
+        str date_next
         decimal amount
         string frequency
         boolean deleted
+        text memo
+        string flag_color
+        str transfer_account_id
     }
     
     TRANSACTIONS ||--o{ ACCOUNTS : "belongs to"
@@ -73,4 +83,3 @@ erDiagram
     SCHEDULED_TRANSACTIONS ||--o{ PAYEES : "belongs to"
     SCHEDULED_TRANSACTIONS ||--o{ DATES : "scheduled on"
 ```
-

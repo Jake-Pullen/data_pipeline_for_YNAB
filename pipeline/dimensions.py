@@ -200,7 +200,7 @@ class DimDate(Dimensions):
         try:
             # Create a new column to indicate if the date is a weekday or weekend
             dates_df = dates_df.with_columns([
-                (pl.col('weekday') < 5).alias('is_weekday')  # True for weekdays (Monday to Friday), False for weekends (Saturday and Sunday)
+                (pl.col('weekday') < 6).alias('is_weekday')  # True for weekdays (Monday to Friday), False for weekends (Saturday and Sunday)
             ])
         except Exception as e:
             logging.error(f"Failed to create a new column to indicate if the date is a weekday or weekend: {e}")
