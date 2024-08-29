@@ -113,9 +113,9 @@ class DimCategories(Dimensions):
                 pl.col('note').fill_null('none')
             ])
             fix_categories_values = fill_null_category_values.with_columns([
-                (pl.col('balance') / 100),
-                (pl.col('budgeted') / 100),
-                (pl.col('activity') / 100)
+                (pl.col('balance') / 1000),
+                (pl.col('budgeted') / 1000),
+                (pl.col('activity') / 1000)
             ])
             drop_categories_columns = fix_categories_values.drop([
                 'id', 'name'
