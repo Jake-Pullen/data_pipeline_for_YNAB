@@ -25,7 +25,7 @@ For the `BUDGET_ID`, you can get it from the URL of your budget page on the YNAB
 ### Clone the repository
 
 ```bash
-git clone #link tbc
+git clone https://github.com/Jake-Pullen/data_pipeline_for_YNAB.git
 ```
 
 ### Install dependencies
