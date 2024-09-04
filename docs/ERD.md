@@ -81,5 +81,6 @@ erDiagram
     SCHEDULED_TRANSACTIONS ||--o{ ACCOUNTS : "belongs to"
     SCHEDULED_TRANSACTIONS ||--o{ CATEGORIES : "belongs to"
     SCHEDULED_TRANSACTIONS ||--o{ PAYEES : "belongs to"
-    SCHEDULED_TRANSACTIONS ||--o{ DATES : "scheduled on"
+    SCHEDULED_TRANSACTIONS ||--o{ DATES : "First Scheduled"
+    SCHEDULED_TRANSACTIONS ||--o{ DATES : "Next Scheduled"
 ```
