@@ -5,22 +5,33 @@ import plotly.express as px
 from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
 import pandas as pd
+import logging
+import sys
+import config.exit_codes as ec
 
-accounts = pl.read_parquet('data/warehouse/accounts.parquet')
-categories = pl.read_parquet('data/warehouse/categories.parquet')
-dates = pl.read_parquet('data/warehouse/dates.parquet')
-payees = pl.read_parquet('data/warehouse/payees.parquet')
-scheduled_transactions = pl.read_parquet('data/warehouse/scheduled_transactions.parquet')
-transactions = pl.read_parquet('data/warehouse/transactions.parquet')
+try:
+    accounts = pl.read_parquet('data/warehouse/accounts.parquet')
+    categories = pl.read_parquet('data/warehouse/categories.parquet')
+    dates = pl.read_parquet('data/warehouse/dates.parquet')
+    payees = pl.read_parquet('data/warehouse/payees.parquet')
+    scheduled_transactions = pl.read_parquet('data/warehouse/scheduled_transactions.parquet')
+    transactions = pl.read_parquet('data/warehouse/transactions.parquet')
+except FileNotFoundError:
+    logging.error('Data warehouse files not found. Run the data pipeline to create them.')
+    sys.exit(ec.MISSING_DATA_FILES)
 
-# Join transactions with accounts, categories, and payees to create a master DataFrame
-master_df = transactions.join(categories, left_on='category_id', right_on='id', suffix='_category')\
-                    .join(accounts, left_on='account_id', right_on='id', suffix='_account')\
-                    .join(payees, left_on='payee_id', right_on='id', suffix='_payee')\
-                    .join(dates, left_on='transaction_date', right_on='date_id', suffix='_date')\
+try:
+    # Join transactions with accounts, categories, and payees to create a master DataFrame
+    master_transactions = transactions.join(categories, left_on='category_id', right_on='category_id', suffix='_category')\
+                        .join(accounts, left_on='account_id', right_on='account_id', suffix='_account')\
+                        .join(payees, left_on='payee_id', right_on='payee_id', suffix='_payee')\
+                        .join(dates, left_on='transaction_date', right_on='date_id', suffix='_date')
+except Exception as e:
+    logging.error(f'Error joining DataFrames: {e}')
+    sys.exit(ec.BAD_JOIN)
 
 # Create aggregations
-spend_per_day = master_df.sql('''
+spend_per_day = master_transactions.sql('''
     SELECT 
         date,
         year,
@@ -34,7 +45,7 @@ spend_per_day = master_df.sql('''
     '''
 )
 
-spend_per_category = master_df.sql('''
+spend_per_category = master_transactions.sql('''
     SELECT
         category_name,
         ABS(SUM(transaction_amount)) as total
@@ -45,7 +56,7 @@ spend_per_category = master_df.sql('''
     '''
 )
 
-spend_per_payee = master_df.sql('''
+spend_per_payee = master_transactions.sql('''
     SELECT
         payee_name,
         ABS(SUM(transaction_amount)) as total
