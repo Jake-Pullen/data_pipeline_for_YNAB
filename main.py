@@ -39,22 +39,24 @@ if not API_TOKEN or not BUDGET_ID:
     logging.error('API_TOKEN or BUDGET_ID is not set in .env file')
     sys.exit(ec.MISSING_ENV_VARS)
 
-try:
-    with open('config/config.yaml', 'r') as file:
-        config = yaml.safe_load(file)
-except FileNotFoundError:
-    logging.error('config.yaml file not found')
-    sys.exit(ec.MISSING_CONFIG_FILE)
-except yaml.YAMLError as e:
-    logging.error(f'Error loading config.yaml: {e}')
-    sys.exit(ec.CORRUPTED_CONFIG_FILE)
-
-config['API_TOKEN'] = API_TOKEN
-config['BUDGET_ID'] = BUDGET_ID
+def load_config():
+    try:
+        with open('config/config.yaml', 'r') as file:
+            config = yaml.safe_load(file)
+        return config
+    except FileNotFoundError:
+        logging.error('config.yaml file not found')
+        sys.exit(ec.MISSING_CONFIG_FILE)
+    except yaml.YAMLError as e:
+        logging.error(f'Error loading config.yaml: {e}')
+        sys.exit(ec.CORRUPTED_CONFIG_FILE)
 
     #sys.exit(ec.SUCCESS)
 
 if __name__ == '__main__':
+    config = load_config()
+    config['API_TOKEN'] = API_TOKEN
+    config['BUDGET_ID'] = BUDGET_ID
     try:
         pipeline_main(config)
         
