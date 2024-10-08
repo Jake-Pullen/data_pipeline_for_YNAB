@@ -5,7 +5,8 @@ import os
 from typing import Dict, Any
 import logging
 
-from pipeline.ingest import Ingest  # Assuming the class is named Ingest
+from pipeline.ingest import Ingest
+import config.exit_codes as ec
 
 # Mock configuration for initializing the Ingest class
 mock_config = {
@@ -174,6 +175,133 @@ def test_update_server_knowledge_cache_write_error():
             ingest_instance.update_server_knowledge_cache(entity, server_knowledge)
 
         mock_logging_error.assert_called_once_with(f"Failed to update knowledge cache for {entity} in {mock_config['knowledge_file']}")
+
+def test_check_rate_limit_above_threshold():
+    response = MagicMock()
+    response.headers = {'X-Rate-Limit': '10/100'}
+    
+    ingest_instance = Ingest(mock_config)
+    result = ingest_instance.check_rate_limit(response)
+    
+    assert result is None
+
+def test_check_rate_limit_below_threshold():
+    response = MagicMock()
+    response.headers = {'X-Rate-Limit': '90/100'}
+    
+    ingest_instance = Ingest(mock_config)
+    result = ingest_instance.check_rate_limit(response)
+    
+    assert result is None
+
+def test_check_rate_limit_exceeded():
+    response = MagicMock()
+    response.headers = {'X-Rate-Limit': '100/100'}
+    
+    ingest_instance = Ingest(mock_config)
+    result = ingest_instance.check_rate_limit(response)
+    
+    assert result is True
+
+def test_check_rate_limit_header_missing():
+    response = MagicMock()
+    response.headers = {}
+    
+    ingest_instance = Ingest(mock_config)
+    result = ingest_instance.check_rate_limit(response)
+    
+    assert result is None
+
+def test_handle_response_bad_request():
+    response = MagicMock()
+    response.status_code = 400
+    
+    ingest_instance = Ingest(mock_config)
+    
+    with pytest.raises(SystemExit) as e:
+        ingest_instance.handle_response(response)
+    assert e.type == SystemExit
+    assert e.value.code == ec.BAD_REQUEST
+
+def test_handle_response_unauthorized():
+    response = MagicMock()
+    response.status_code = 401
+    
+    ingest_instance = Ingest(mock_config)
+    
+    with pytest.raises(SystemExit) as e:
+        ingest_instance.handle_response(response)
+    assert e.type == SystemExit
+    assert e.value.code == ec.UNAUTHORIZED_API_TOKEN
+
+def test_handle_response_forbidden():
+    response = MagicMock()
+    response.status_code = 403
+    
+    ingest_instance = Ingest(mock_config)
+    
+    with pytest.raises(SystemExit) as e:
+        ingest_instance.handle_response(response)
+    assert e.type == SystemExit
+    assert e.value.code == ec.FORBIDDEN
+
+def test_handle_response_not_found():
+    response = MagicMock()
+    response.status_code = 404
+    
+    ingest_instance = Ingest(mock_config)
+    
+    with pytest.raises(SystemExit) as e:
+        ingest_instance.handle_response(response)
+    assert e.type == SystemExit
+    assert e.value.code == ec.NOT_FOUND
+
+def test_handle_response_conflict():
+    response = MagicMock()
+    response.status_code = 409
+    
+    ingest_instance = Ingest(mock_config)
+    
+    with pytest.raises(SystemExit) as e:
+        ingest_instance.handle_response(response)
+    assert e.type == SystemExit
+    assert e.value.code == ec.CONFLICT
+
+def test_handle_response_too_many_requests():
+    response = MagicMock()
+    response.status_code = 429
+    
+    ingest_instance = Ingest(mock_config)
+    
+    result = ingest_instance.handle_response(response)
+    assert result is True
+
+def test_handle_response_internal_server_error():
+    response = MagicMock()
+    response.status_code = 500
+    
+    ingest_instance = Ingest(mock_config)
+    
+    result = ingest_instance.handle_response(response)
+    assert result is True
+
+def test_handle_response_service_unavailable():
+    response = MagicMock()
+    response.status_code = 503
+    
+    ingest_instance = Ingest(mock_config)
+    
+    result = ingest_instance.handle_response(response)
+    assert result is True
+
+def test_handle_response_ok():
+    response = MagicMock()
+    response.status_code = 200
+    
+    ingest_instance = Ingest(mock_config)
+    
+    result = ingest_instance.handle_response(response)
+    assert result is False
 
 if __name__ == "__main__":
     pytest.main()

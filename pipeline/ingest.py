@@ -76,11 +76,9 @@ class Ingest:
             logging.info(f"Rate Limit: {remaining_requests}/{limit} requests remaining.")
             if remaining_requests < 20:
                 logging.warning("Approaching rate limit. Consider pausing further requests.")
-                # Implement pause or delay logic here if necessary
-            if remaining_requests == 1:
+            if remaining_requests == 0:
                 logging.error("Rate limit exceeded. ending requests here and moving on with what we have.")
                 return True #returning True here to break out of any more ingestions
-                
         else:
             logging.warning("X-Rate-Limit header is missing.")
     
@@ -95,7 +93,7 @@ class Ingest:
             logging.error("Forbidden. Access is denied.")
             sys.exit(ec.FORBIDDEN)
         elif response.status_code == 404:
-            logging.error("Not found. The specified URI does not exist.")
+            logging.error("Not found. The specified URL does not exist.")
             sys.exit(ec.NOT_FOUND)
         elif response.status_code == 409:
             logging.error("Conflict. The resource cannot be saved due to a conflict.")
