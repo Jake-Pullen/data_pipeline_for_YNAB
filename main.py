@@ -24,21 +24,6 @@ def set_up_logging():
         queue_handler.listener.start()
         atexit.register(queue_handler.listener.stop)
 
-logger = logging.getLogger("data_pipeline_for_ynab")
-os.makedirs('logs', exist_ok=True)
-set_up_logging()
-
-# Load environment variables
-dotenv.load_dotenv()
-
-API_TOKEN = os.getenv('API_TOKEN')
-BUDGET_ID = os.getenv('BUDGET_ID')
-
-
-if not API_TOKEN or not BUDGET_ID:
-    logging.error('API_TOKEN or BUDGET_ID is not set in .env file')
-    sys.exit(ec.MISSING_ENV_VARS)
-
 def load_config():
     try:
         with open('config/config.yaml', 'r') as file:
@@ -51,7 +36,19 @@ def load_config():
         logging.error(f'Error loading config.yaml: {e}')
         sys.exit(ec.CORRUPTED_CONFIG_FILE)
 
-    #sys.exit(ec.SUCCESS)
+logger = logging.getLogger("data_pipeline_for_ynab")
+os.makedirs('logs', exist_ok=True)
+set_up_logging()
+
+# Load environment variables
+dotenv.load_dotenv()
+
+API_TOKEN = os.getenv('API_TOKEN')
+BUDGET_ID = os.getenv('BUDGET_ID')
+
+if not API_TOKEN or not BUDGET_ID:
+    logging.error('API_TOKEN or BUDGET_ID is not set in .env file')
+    sys.exit(ec.MISSING_ENV_VARS)
 
 if __name__ == '__main__':
     config = load_config()

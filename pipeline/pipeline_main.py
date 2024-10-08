@@ -12,7 +12,8 @@ def pipeline_main(config):
     '''Run the data pipeline'''
     logging.info('Starting data pipeline')
 
-    Ingest(config)
+    ingest = Ingest(config)
+    ingest.start_ingestion()
     RawToBase(config)
     DimAccounts(config)
     DimCategories(config)

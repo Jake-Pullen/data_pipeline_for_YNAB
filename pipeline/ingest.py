@@ -10,7 +10,6 @@ import config.exit_codes as ec
 
 class Ingest:
 
-
     def __init__(self, config: Dict[str, Any]):
         """
         Initialize the Ingest class with the provided configuration.
@@ -25,7 +24,6 @@ class Ingest:
         self.knowledge_cache = self.load_knowledge_cache()
         self.MAX_RETRIES = config['REQUESTS_MAX_RETRIES']
         self.RETRY_DELAY = config['REQUESTS_RETRY_DELAY']
-        self.fetch_and_cache_entity_data()
 
     def load_knowledge_cache(self) -> Dict[str, Any]:
         """
@@ -118,7 +116,7 @@ class Ingest:
             response.raise_for_status()
             return False
 
-    def fetch_and_cache_entity_data(self):
+    def start_ingestion(self):
         """
         Fetch and cache data for all entities.
         """
