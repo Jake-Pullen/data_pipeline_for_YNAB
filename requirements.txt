@@ -7,3 +7,5 @@ dash
 pandas
 pyarrow 
 dash-bootstrap-components
+# testing requirements below
+pytest

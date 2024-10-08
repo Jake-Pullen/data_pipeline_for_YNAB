@@ -21,18 +21,9 @@ class Ingest:
         self.entities = config['entities']
         self.raw_data_path = config['raw_data_path']
         self.headers = {'Authorization': f'Bearer {self.api_token}'}
-        self.knowledge_cache = self.load_knowledge_cache()
         self.MAX_RETRIES = config['REQUESTS_MAX_RETRIES']
         self.RETRY_DELAY = config['REQUESTS_RETRY_DELAY']
 
-    def load_knowledge_cache(self) -> Dict[str, Any]:
-        """
-        Load the knowledge cache from the file if it exists.
-        """
-        if os.path.exists(self.knowledge_file):
-            with open(self.knowledge_file, 'r') as f:
-                return json.load(f)
-        return {}
 
     def save_entity_data_to_raw(self, entity: str, data: Dict[str, Any]):
         """
@@ -48,25 +39,31 @@ class Ingest:
             with open(entity_file, 'w') as f:
                 json.dump(data, f, indent=4)
         except Exception as e:
-            logging.error(f"Error saving {entity} data: {e}")
+            logging.error(f"Failed to save data for {entity} to {entity_file}")
+            raise e
 
-
+    def load_knowledge_cache(self) -> Dict[str, Any]:
+        """
+        Load the knowledge cache from the file if it exists.
+        """
+        if not os.path.exists(self.knowledge_file):
+            os.makedirs(os.path.dirname(self.knowledge_file),exist_ok=True)
+            return {}
+        with open(self.knowledge_file, 'r') as f:
+            return json.load(f)
+        
     def update_server_knowledge_cache(self, entity: str, server_knowledge: Any):
         """
         Update the server knowledge cache for a specific entity.
         """
-        try:
-            with open(self.knowledge_file, 'r') as f:
-                knowledge_cache = json.load(f)
-        except FileNotFoundError:
-            logging.info(f"Knowledge file not found. Creating a new one at {self.knowledge_file}. This is normal for the first run.")
-            os.makedirs(os.path.dirname(self.knowledge_file), exist_ok=True)
-            knowledge_cache = {}
-        
+        knowledge_cache = self.load_knowledge_cache()
         knowledge_cache[entity] = server_knowledge
-        
-        with open(self.knowledge_file, 'w') as f:
-            json.dump(knowledge_cache, f, indent=4)
+        try:
+            with open(self.knowledge_file, 'w') as f:
+                json.dump(knowledge_cache, f, indent=4)
+        except Exception as e:
+            logging.error(f"Failed to update knowledge cache for {entity} in {self.knowledge_file}")
+            raise e
 
     def check_rate_limit(self, response: requests.Response):
         """
@@ -125,8 +122,8 @@ class Ingest:
             if os.path.exists(file_path) and os.listdir(file_path):
                 logging.warning(f"Raw data exists for {entity} processing any raw data we already have.")
                 break # break here instead of continue as we dont want to update our server knowledge cache and potentially miss data.
-
-            last_knowledge = self.knowledge_cache.get(entity, 0)
+            knowledge_cache = self.load_knowledge_cache()
+            last_knowledge = knowledge_cache.get(entity, 0)
             #logging.debug(f'Last Knowledge of {entity}: {last_knowledge}')
             logging.info(f'Fetching {entity} data since last knowledge: {last_knowledge}')
             url = f'{self.base_url}/{self.budget_id}/{entity}?last_knowledge_of_server={last_knowledge}'
